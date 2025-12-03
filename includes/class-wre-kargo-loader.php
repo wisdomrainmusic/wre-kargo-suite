@@ -6,6 +6,14 @@ class WRE_Kargo_Loader {
     public function __construct() {
         error_log("WRE Kargo Suite: Loader initialized");
 
+        if ( is_admin() ) {
+            require_once WRE_KARGO_SUITE_DIR . 'includes/admin/class-wre-kargo-admin-menu.php';
+            require_once WRE_KARGO_SUITE_DIR . 'includes/admin/class-wre-kargo-admin-settings.php';
+
+            new WRE_Kargo_Admin_Menu();
+            new WRE_Kargo_Admin_Settings();
+        }
+
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
 
         // WooCommerce Shipping Methods
