@@ -6,9 +6,12 @@ class WRE_Kargo_Loader {
     public function __construct() {
         error_log("WRE Kargo Suite: Loader initialized");
 
+        require_once WRE_KARGO_SUITE_DIR . 'includes/admin/class-wre-kargo-admin-settings.php';
+        require_once WRE_KARGO_SUITE_DIR . 'includes/providers/class-wre-provider-basitkargo.php';
+        require_once WRE_KARGO_SUITE_DIR . 'includes/class-wre-kargo-autosend.php';
+
         if ( is_admin() ) {
             require_once WRE_KARGO_SUITE_DIR . 'includes/admin/class-wre-kargo-admin-menu.php';
-            require_once WRE_KARGO_SUITE_DIR . 'includes/admin/class-wre-kargo-admin-settings.php';
 
             new WRE_Kargo_Admin_Menu();
             new WRE_Kargo_Admin_Settings();
@@ -18,6 +21,9 @@ class WRE_Kargo_Loader {
 
         // WooCommerce Shipping Methods
         add_filter( 'woocommerce_shipping_methods', [ $this, 'register_shipping_methods' ] );
+
+        new WRE_Provider_BasitKargo();
+        new WRE_Kargo_AutoSend();
     }
 
     public function register_shipping_methods( $methods ) {
