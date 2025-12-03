@@ -1,0 +1,25 @@
+/* WRE Kargo Suite v2 - Admin Styles */
+
+#wre-kargo-admin-info {
+    padding: 12px;
+    background: #f0f6ff;
+    border-left: 4px solid #007cba;
+    margin: 15px 0;
+}
+
+.wre-kargo-settings {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    padding: 20px;
+    margin-top: 10px;
+}
+
+.wre-kargo-settings .form-table th {
+    width: 220px;
+    padding-left: 0;
+}
+
+.wre-kargo-settings .form-table td .description {
+    margin-top: 4px;
+    color: #555d66;
+}

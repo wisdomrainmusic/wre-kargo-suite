@@ -1,21 +1,32 @@
 <?php
 /**
  * Plugin Name: WRE Kargo Suite
- * Description: Multi-carrier shipping integration suite for WooCommerce (Sürat, Aras, Yurtiçi, PTT, DHL, Basit Kargo).
- * Version: 0.1.0
+ * Description: Aras, Yurtiçi, Sürat, PTT ve DHL için profesyonel kargo entegrasyonu.
+ * Version: 2.0.0
  * Author: Wisdom Rain
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 
-define( 'WRE_KARGO_SUITE_VERSION', '0.1.0' );
-define( 'WRE_KARGO_SUITE_DIR', plugin_dir_path( __FILE__ ) );
-define( 'WRE_KARGO_SUITE_URL', plugin_dir_url( __FILE__ ) );
+define( 'WRE_KARGO_VERSION', '2.0.0' );
+define( 'WRE_KARGO_DIR', plugin_dir_path( __FILE__ ) );
+define( 'WRE_KARGO_URL', plugin_dir_url( __FILE__ ) );
 
-// Loader
-require_once WRE_KARGO_SUITE_DIR . 'includes/class-wre-kargo-loader.php';
+// Backward compatibility with earlier constant names used in the suite.
+if ( ! defined( 'WRE_KARGO_SUITE_VERSION' ) ) {
+    define( 'WRE_KARGO_SUITE_VERSION', WRE_KARGO_VERSION );
+}
 
-// Init plugin
-add_action( 'plugins_loaded', function() {
-    new WRE_Kargo_Loader();
-});
+if ( ! defined( 'WRE_KARGO_SUITE_DIR' ) ) {
+    define( 'WRE_KARGO_SUITE_DIR', WRE_KARGO_DIR );
+}
+
+if ( ! defined( 'WRE_KARGO_SUITE_URL' ) ) {
+    define( 'WRE_KARGO_SUITE_URL', WRE_KARGO_URL );
+}
+
+require_once WRE_KARGO_DIR . 'includes/class-wre-kargo-manager.php';
+
+add_action( 'plugins_loaded', array( 'WRE_Kargo_Manager', 'init' ) );
