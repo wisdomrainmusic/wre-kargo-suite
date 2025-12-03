@@ -1,164 +1,117 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-}
+if (!defined('ABSPATH')) exit;
 
-class WRE_Admin_Menu {
-
-    /**
-     * @var WRE_Kargo_Settings
-     */
-    protected $settings;
-
-    /**
-     * @var array<string, string>
-     */
-    protected $carriers = array(
-        'aras'   => 'Aras Kargo',
-        'surat'  => 'Sürat Kargo',
-        'yurtici'=> 'Yurtiçi Kargo',
-        'ptt'    => 'PTT Kargo',
-        'dhl'    => 'DHL / HepsiJET',
-    );
+class WRE_Kargo_Admin_Menu {
 
     public function __construct() {
-        $this->settings = new WRE_Kargo_Settings();
-
-        add_action( 'admin_menu', array( $this, 'register_menu' ) );
-        add_action( 'admin_init', array( $this, 'handle_settings_save' ) );
+        add_action('admin_menu', [$this, 'register_menu']);
     }
 
     public function register_menu() {
 
-        // Ana Menü
+        // ANA MENÜ
         add_menu_page(
             'WRE Kargo Suite',
             'WRE Kargo Suite',
             'manage_options',
             'wre-kargo-suite',
-            array( $this, 'render_main_page' ),
-            'dashicons-admin-site-alt3',
+            [$this, 'render_main_page'],
+            'dashicons-admin-site',
             56
         );
 
-        // Alt menüler (firma bazlı)
-        foreach ( $this->carriers as $slug => $title ) {
-            add_submenu_page(
-                'wre-kargo-suite',
-                $title . ' ' . __( 'Ayarları', 'wre-kargo-suite' ),
-                $title,
-                'manage_options',
-                'wre-kargo-' . $slug,
-                function() use ( $slug, $title ) {
-                    $this->render_carrier_page( $slug, $title );
-                }
-            );
-        }
-    }
+        // ---- ALT MENÜLER ---- //
 
-    public function render_main_page() {
-        echo '<h1>WRE Kargo Suite – Ayarlar</h1>';
-        echo '<p>Lütfen sol menüden bir kargo firması seçin.</p>';
-    }
-
-    public function render_carrier_page( $slug, $title ) {
-
-        $view_file = WRE_KARGO_DIR . "admin/views/settings-{$slug}.php";
-
-        $all_settings     = $this->settings->get_settings();
-        $carrier_settings = isset( $all_settings[ $slug ] ) && is_array( $all_settings[ $slug ] ) ? $all_settings[ $slug ] : array();
-        $fields           = $this->get_carrier_fields( $slug );
-
-        echo '<div class="wrap">';
-        settings_errors( 'wre_kargo_messages' );
-        echo "<h1>{$title} Ayarları</h1>";
-
-        if ( file_exists( $view_file ) ) {
-            include $view_file;
-        } else {
-            echo "<p>Ayar dosyası bulunamadı: settings-{$slug}.php</p>";
-        }
-
-        echo '</div>';
-    }
-
-    public function handle_settings_save() {
-        if ( ! isset( $_POST['wre_kargo_nonce'] ) ) {
-            return;
-        }
-
-        if ( ! isset( $_POST['carrier'] ) || ! array_key_exists( sanitize_key( wp_unslash( $_POST['carrier'] ) ), $this->carriers ) ) {
-            return;
-        }
-
-        $carrier = sanitize_key( wp_unslash( $_POST['carrier'] ) );
-
-        if ( ! current_user_can( 'manage_options' ) ) {
-            return;
-        }
-
-        if ( ! wp_verify_nonce( wp_unslash( $_POST['wre_kargo_nonce'] ), 'wre_kargo_save_settings' ) ) {
-            return;
-        }
-
-        $settings = $this->settings->get_settings();
-        $fields   = $this->get_carrier_fields( $carrier );
-
-        $settings[ $carrier ] = array();
-
-        foreach ( $fields as $field ) {
-            $field_id = $field['id'];
-
-            if ( 'checkbox' === $field['type'] ) {
-                $settings[ $carrier ][ $field_id ] = isset( $_POST[ $field_id ] ) ? 'yes' : 'no';
-                continue;
-            }
-
-            $value = isset( $_POST[ $field_id ] ) ? sanitize_text_field( wp_unslash( $_POST[ $field_id ] ) ) : '';
-            $settings[ $carrier ][ $field_id ] = $value;
-        }
-
-        $this->settings->update_settings( $settings );
-
-        add_settings_error( 'wre_kargo_messages', 'wre_kargo_saved', __( 'Ayarlar kaydedildi.', 'wre-kargo-suite' ), 'updated' );
-    }
-
-    protected function get_carrier_fields( $carrier ) {
-        $default_fields = array(
-            array(
-                'id'    => 'api_url',
-                'label' => __( 'API URL', 'wre-kargo-suite' ),
-                'type'  => 'text',
-                'desc'  => __( 'Servis uç noktası.', 'wre-kargo-suite' ),
-            ),
-            array(
-                'id'    => 'api_username',
-                'label' => __( 'API Kullanıcı Adı', 'wre-kargo-suite' ),
-                'type'  => 'text',
-                'desc'  => __( 'Entegrasyon kullanıcı adı.', 'wre-kargo-suite' ),
-            ),
-            array(
-                'id'    => 'api_password',
-                'label' => __( 'API Şifresi', 'wre-kargo-suite' ),
-                'type'  => 'text',
-                'desc'  => __( 'Entegrasyon şifresi.', 'wre-kargo-suite' ),
-            ),
-            array(
-                'id'    => 'account_number',
-                'label' => __( 'Müşteri/Üye Numarası', 'wre-kargo-suite' ),
-                'type'  => 'text',
-                'desc'  => __( 'Kargo firması müşteri numaranız.', 'wre-kargo-suite' ),
-            ),
-            array(
-                'id'    => 'test_mode',
-                'label' => __( 'Test Modu', 'wre-kargo-suite' ),
-                'type'  => 'checkbox',
-                'desc'  => __( 'Test modunu aktif et.', 'wre-kargo-suite' ),
-            ),
+        // 1) ARAS
+        add_submenu_page(
+            'wre-kargo-suite',
+            'Aras Kargo Ayarları',
+            'Aras Kargo',
+            'manage_options',
+            'wre-kargo-aras',
+            [$this, 'render_aras']
         );
 
-        return apply_filters( 'wre_kargo_carrier_fields', $default_fields, $carrier );
+        // 2) SÜRAT
+        add_submenu_page(
+            'wre-kargo-suite',
+            'Sürat Kargo Ayarları',
+            'Sürat Kargo',
+            'manage_options',
+            'wre-kargo-surat',
+            [$this, 'render_surat']
+        );
+
+        // 3) YURTİÇİ
+        add_submenu_page(
+            'wre-kargo-suite',
+            'Yurtiçi Kargo Ayarları',
+            'Yurtiçi Kargo',
+            'manage_options',
+            'wre-kargo-yurtici',
+            [$this, 'render_yurtici']
+        );
+
+        // 4) PTT
+        add_submenu_page(
+            'wre-kargo-suite',
+            'PTT Kargo Ayarları',
+            'PTT Kargo',
+            'manage_options',
+            'wre-kargo-ptt',
+            [$this, 'render_ptt']
+        );
+
+        // 5) DHL
+        add_submenu_page(
+            'wre-kargo-suite',
+            'DHL Kargo Ayarları',
+            'DHL Kargo',
+            'manage_options',
+            'wre-kargo-dhl',
+            [$this, 'render_dhl']
+        );
+
+        // 6) HEPSİJET
+        add_submenu_page(
+            'wre-kargo-suite',
+            'HepsiJET Ayarları',
+            'HepsiJET',
+            'manage_options',
+            'wre-kargo-hepsijet',
+            [$this, 'render_hepsijet']
+        );
+    }
+
+    // ---- SAYFA RENDER FONKSİYONLARI ---- //
+
+    public function render_main_page() {
+        echo '<div class="wrap"><h1>WRE Kargo Suite – Ayarlar</h1><p>Lütfen sol menüden bir kargo firması seçin.</p></div>';
+    }
+
+    public function render_aras() {
+        echo '<div class="wrap"><h1>Aras Kargo Ayarları</h1><p>Aras Kargo API ayarları buraya gelecek.</p></div>';
+    }
+
+    public function render_surat() {
+        echo '<div class="wrap"><h1>Sürat Kargo Ayarları</h1><p>Sürat Kargo API ayarları buraya gelecek.</p></div>';
+    }
+
+    public function render_yurtici() {
+        echo '<div class="wrap"><h1>Yurtiçi Kargo Ayarları</h1><p>Yurtiçi Kargo API ayarları buraya gelecek.</p></div>';
+    }
+
+    public function render_ptt() {
+        echo '<div class="wrap"><h1>PTT Kargo Ayarları</h1><p>PTT Kargo API ayarları buraya gelecek.</p></div>';
+    }
+
+    public function render_dhl() {
+        echo '<div class="wrap"><h1>DHL Kargo Ayarları</h1><p>DHL Kargo API ayarları buraya gelecek.</p></div>';
+    }
+
+    public function render_hepsijet() {
+        echo '<div class="wrap"><h1>HepsiJET Ayarları</h1><p>HepsiJET API ayarları buraya gelecek.</p></div>';
     }
 }
 
-new WRE_Admin_Menu();
+new WRE_Kargo_Admin_Menu();
