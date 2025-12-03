@@ -1,0 +1,8 @@
+/* WRE Kargo Suite - Admin Styles (initial commit) */
+
+#wre-kargo-admin-info {
+    padding: 12px;
+    background: #f0f6ff;
+    border-left: 4px solid #007cba;
+    margin-bottom: 20px;
+}
