@@ -53,19 +53,22 @@ class WRE_Kargo_Admin_Settings {
     public function sanitize( $input ) {
         $output = [];
 
+        $input_bk = $input['basitkargo'] ?? [];
+
         $output['basitkargo'] = [
-            'token'         => sanitize_text_field( $input['basitkargo']['token'] ?? '' ),
-            'profile_id'    => sanitize_text_field( $input['basitkargo']['profile_id'] ?? '' ),
-            'address_id'    => sanitize_text_field( $input['basitkargo']['address_id'] ?? '' ),
-            'handler_code'  => sanitize_text_field( $input['basitkargo']['handler_code'] ?? 'ECONOMIC' ),
-            'payment_method'=> sanitize_text_field( $input['basitkargo']['payment_method'] ?? 'ADVANCE' ),
-            'cod_type'      => sanitize_text_field( $input['basitkargo']['cod_type'] ?? 'CASH' ),
-            'auto_send'     => sanitize_text_field( $input['basitkargo']['auto_send'] ?? 'yes' ),
+            'token'         => sanitize_text_field( $input_bk['token'] ?? '' ),
+            'profile_id'    => sanitize_text_field( $input_bk['profile_id'] ?? '' ),
+            'address_id'    => sanitize_text_field( $input_bk['address_id'] ?? '' ),
+            'handler_code'  => sanitize_text_field( $input_bk['handler_code'] ?? 'ECONOMIC' ),
+            'payment_method'=> sanitize_text_field( $input_bk['payment_method'] ?? 'ADVANCE' ),
+            'cod_type'      => sanitize_text_field( $input_bk['cod_type'] ?? 'CASH' ),
+            'auto_send'     => sanitize_text_field( $input_bk['auto_send'] ?? 'yes' ),
+
             'package'       => [
-                'height' => floatval( $input['basitkargo']['package']['height'] ?? 10 ),
-                'width'  => floatval( $input['basitkargo']['package']['width'] ?? 10 ),
-                'depth'  => floatval( $input['basitkargo']['package']['depth'] ?? 10 ),
-                'weight' => floatval( $input['basitkargo']['package']['weight'] ?? 1 ),
+                'height' => floatval( $input_bk['package']['height'] ?? 10 ),
+                'width'  => floatval( $input_bk['package']['width'] ?? 10 ),
+                'depth'  => floatval( $input_bk['package']['depth'] ?? 10 ),
+                'weight' => floatval( $input_bk['package']['weight'] ?? 1 ),
             ],
         ];
 
