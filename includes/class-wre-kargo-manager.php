@@ -14,7 +14,7 @@ class WRE_Kargo_Manager {
     public function init() {
 
         // ------------------------------------------------------
-        // Load constants
+        // Define plugin constants
         // ------------------------------------------------------
         $this->define_constants();
 
@@ -33,11 +33,11 @@ class WRE_Kargo_Manager {
 
     private function define_constants() {
         if (!defined('WRE_KARGO_SUITE_DIR')) {
-            define('WRE_KARGO_SUITE_DIR', plugin_dir_path(__FILE__) . '../');
+            define('WRE_KARGO_SUITE_DIR', plugin_dir_path(__DIR__));
         }
 
         if (!defined('WRE_KARGO_SUITE_URL')) {
-            define('WRE_KARGO_SUITE_URL', plugin_dir_url(__FILE__) . '../');
+            define('WRE_KARGO_SUITE_URL', plugin_dir_url(__DIR__));
         }
     }
 
@@ -58,5 +58,3 @@ class WRE_Kargo_Manager {
         require_once WRE_KARGO_SUITE_DIR . 'admin/pages/class-wre-page-dhl.php';
     }
 }
-
-new WRE_Kargo_Manager();
